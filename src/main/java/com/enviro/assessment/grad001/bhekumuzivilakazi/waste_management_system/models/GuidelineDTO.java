@@ -1,12 +1,20 @@
-package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model;
+package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Data Transfer Object (DTO) for the Guideline entity.
  * This class is used to transfer guideline data between layers (e.g., from controller to service).
  */
 public class GuidelineDTO {
-
+    
+    @NotNull(groups = CreateGroup.class, message = "Title cannot be null during Adding")
+    @Size(min = 2, groups = CreateGroup.class, message = "Title must have at least 2 characters")
     private String title;  // The title of the guideline
+    
+    @NotNull(groups = CreateGroup.class, message = "Description cannot be null during Adding")
+    @Size(min = 2, groups = CreateGroup.class, message = "Description must have at least 2 characters")
     private String information;  // The description or information about the guideline
 
     /**
@@ -45,4 +53,3 @@ public class GuidelineDTO {
         this.information = information;
     }
 }
-
