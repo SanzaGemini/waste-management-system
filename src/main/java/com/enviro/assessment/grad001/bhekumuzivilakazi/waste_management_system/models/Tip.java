@@ -1,4 +1,4 @@
-package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model;
+package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +23,7 @@ public class Tip {
     @Column(name = "Title")
     private String title;  // Title of the tip
 
-    @Column(name = "Description")
+    @Column(name = "Information")
     private String information;  // Description or details about the tip
 
     /**
@@ -76,12 +76,12 @@ public class Tip {
      */
     public void updateTip(TipDTO tipDTO) {
         // Update title if the new value is different from the current one
-        if (this.title != tipDTO.getTitle()) {
+        if (this.title == null || !this.title.equals(tipDTO.getTitle())) {
             this.title = tipDTO.getTitle();
         }
         
         // Update information if the new value is different from the current one
-        if (this.information != tipDTO.getInformation()) {
+        if (this.information == null || !this.information.equals(tipDTO.getInformation())) {
             this.information = tipDTO.getInformation();
         }
     }
