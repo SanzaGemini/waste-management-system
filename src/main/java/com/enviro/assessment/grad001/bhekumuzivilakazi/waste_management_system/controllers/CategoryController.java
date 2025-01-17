@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.BindExceptionHandler;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.NotFoundException;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.Category;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.CategoryDTO;
@@ -44,6 +45,9 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<ApiResponse<Object>> addCategory(@RequestBody CategoryDTO categoryDTO, BindingResult bindingResult){
         // Call service to save the category and return the response with success status
+        if(bindingResult.hasErrors()){
+            return BindExceptionHandler.handleBindException(bindingResult.getAllErrors());
+        }
         Category savedCategory = categoryService.saveCategory(categoryDTO); 
         return new ResponseEntity<>(ApiResponse.success(savedCategory), HttpStatus.CREATED); // Return 201 Created
     }
@@ -55,9 +59,13 @@ public class CategoryController {
      */
     @GetMapping("{id}")
     public ResponseEntity<ApiResponse<Object>> getCategoryById(@PathVariable Long id){
-        Category category = categoryService.getCategoryById(id)
-            .orElseThrow(() -> new NotFoundException("Category", id));  // Handle category not found
-        return new ResponseEntity<>(ApiResponse.success(category), HttpStatus.OK);
+        try {
+            Category category = categoryService.getCategoryById(id).get();  
+            return new ResponseEntity<>(ApiResponse.success(category), HttpStatus.OK);
+        } catch (NotFoundException nE) {
+            return NotFoundException.handleNotFoundException(nE);  
+        }
+       
     }
 
     /**
@@ -78,8 +86,13 @@ public class CategoryController {
      */
     @PutMapping("{id}")
     public ResponseEntity<ApiResponse<Object>> updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO){
-        Category updatedCategory = categoryService.updateCategory(id, categoryDTO);  // Update the category
-        return new ResponseEntity<>(ApiResponse.success(updatedCategory), HttpStatus.OK); 
+          // Update the category
+        try {
+            Category updatedCategory = categoryService.updateCategory(id, categoryDTO);  
+            return new ResponseEntity<>(ApiResponse.success(updatedCategory), HttpStatus.OK);
+        } catch (NotFoundException nE) {
+            return NotFoundException.handleNotFoundException(nE);  
+        } 
     }
 
     /**
