@@ -72,7 +72,7 @@ public class CategoryIT {
         mockMvc.perform(post("/api/v1/categories")
                 .contentType("application/json")
                 .content("{\"title\":\"Recycling Tips\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("success"))  // Check the status field
                 .andExpect(jsonPath("$.message").value("Request was successful"))  // Check the message
                 .andExpect(jsonPath("$.data.title").value("Recycling Tips"));  // Check the category title in the data
@@ -150,7 +150,7 @@ public class CategoryIT {
         // Simulate a NotFoundException by calling an endpoint that will throw the exception
         mockMvc.perform(get("/api/v1/tips/9999")) // Use an ID that doesn't exist
                 .andExpect(status().isNotFound()) // Expect 404 Not Found
-                .andExpect(content().string("Tip not found with ID 9999")); // Replace with your specific message
+                .andExpect(content().string("Tip with Id 9999 not found.")); // Replace with your specific message
     }
 
     @Test
