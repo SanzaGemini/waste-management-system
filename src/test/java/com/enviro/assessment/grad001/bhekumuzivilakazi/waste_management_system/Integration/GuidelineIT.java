@@ -76,7 +76,7 @@ public class GuidelineIT {
         mockMvc.perform(post("/api/v1/guidelines")
                 .contentType("application/json")
                 .content("{\"title\":\"Recycling Tips\",\"information\":\"These are some tips for recycling.\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("success"))  // Check the status field
                 .andExpect(jsonPath("$.message").value("Request was successful"))  // Check the message
                 .andExpect(jsonPath("$.data.title").value("Recycling Tips"))  // Check the title in the data
@@ -149,7 +149,7 @@ public class GuidelineIT {
 
         // Perform the DELETE request
         mockMvc.perform(delete("/api/v1/guidelines/{id}", 2L))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$.status").value("success"))  // Check the status field
                 .andExpect(jsonPath("$.message").value("Guideline deleted successfully"))  // Check the message
                 .andExpect(jsonPath("$.data[0].title").value("Recycling Tips"))  // Check the remaining guideline title
@@ -188,7 +188,7 @@ public class GuidelineIT {
         mockMvc.perform(post("/api/v1/guidelines")
                 .contentType("application/json")
                 .content("{\"title\":\"Recycling Tips\",\"information\":\"These are some tips for recycling.\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("success"))
                 .andExpect(jsonPath("$.message").value("Request was successful"))
                 .andExpect(jsonPath("$.data.title").value("Recycling Tips"))
