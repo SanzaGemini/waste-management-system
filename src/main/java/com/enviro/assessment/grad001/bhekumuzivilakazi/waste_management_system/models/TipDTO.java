@@ -1,7 +1,7 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Data Transfer Object (DTO) for the Tip entity.
