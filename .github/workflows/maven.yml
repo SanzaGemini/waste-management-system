@@ -63,12 +63,3 @@ jobs:
   
     - name: Build with Maven and run unit tests from specific directory
       run: mvn test -Dtest="com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.Integration.IT*
-      i
-      
-      
-      
-      
-      t"
-
-
-
