@@ -1,5 +1,10 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.response.ApiResponse;
+
 public class NotFoundException extends RuntimeException {
 
     /**
@@ -24,5 +29,18 @@ public class NotFoundException extends RuntimeException {
     // Optionally, you could add a constructor to handle scenarios where ID might be null.
     public NotFoundException(String type, String message) {
         super(String.format("%s not found: %s", type, message));
+    }
+
+    /**
+     * Handles NotFoundException globally by returning a 404 response with the exception's message.
+     * @param eNotFoundException The NotFoundException instance to be handled.
+     * @return A ResponseEntity containing the exception message with HTTP status 404 Not Found.
+     */
+    
+
+    public static ResponseEntity<ApiResponse<Object>> handleNotFoundException(NotFoundException eNotFoundException){
+        ApiResponse<Object> response = ApiResponse.failure(eNotFoundException.getMessage());
+        // Return a 404 status with the exception message
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
