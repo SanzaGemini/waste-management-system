@@ -15,10 +15,10 @@
 	<description>Waste sorting mobile application</description>
 	<url/>
 	<developers>
-		<developer>
-			<name>Bhekumuzi Vilakazi</name>
-			<email>sanelevilakazi37@gmail.com</email>
-		<developer/>
+	    <developer>
+	        <name>Bhekumuzi Vilakazi</name>
+	        <email>sanelevilakazi37@gmail.com</email>
+	    </developer>
 	</developers>
 	<properties>
 		<java.version>17</java.version>
