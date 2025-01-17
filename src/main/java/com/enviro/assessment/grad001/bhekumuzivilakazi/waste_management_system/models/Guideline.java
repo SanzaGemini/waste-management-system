@@ -1,4 +1,4 @@
-package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model;
+package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +23,7 @@ public class Guideline {
     @Column(name = "Title")
     private String title;  // Title of the guideline
 
-    @Column(name = "Description")
+    @Column(name = "Information")
     private String information;  // Description or information about the guideline
 
     /**
@@ -76,12 +76,12 @@ public class Guideline {
      */
     public void updateGuideline(GuidelineDTO guidelineDTO) {
         // Update title if the new value is different from the current one
-        if (this.title != guidelineDTO.getTitle()) {
+        if (this.title == null || !this.title.equals(guidelineDTO.getTitle())) {
             this.title = guidelineDTO.getTitle();
         }
-        
+
         // Update information if the new value is different from the current one
-        if (this.information != guidelineDTO.getInformation()) {
+        if (this.information == null || !this.information.equals(guidelineDTO.getInformation())) {
             this.information = guidelineDTO.getInformation();
         }
     }
