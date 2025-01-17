@@ -1,5 +1,11 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.repository;
 
-public interface CategoryRepository {
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model.Category;
+
+public interface CategoryRepository extends JpaRepository<Category,Long>{
+
+    
 }

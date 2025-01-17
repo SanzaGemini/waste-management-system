@@ -88,6 +88,7 @@
 							<goal>integration-test</goal>
 							<goal>verify</goal>
 						</goals>
+						<phase>integration-test</phase> <!-- Define lifecycle phase -->
 					</execution>
 				</executions>
 			</plugin>
@@ -95,3 +96,5 @@
 	</build>
 
 </project>
+
+

@@ -1,5 +1,9 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.repository;
 
-public interface GuidelineRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model.Guideline;
+
+public interface GuidelineRepository  extends JpaRepository<Guideline,Long>{
 
 }
