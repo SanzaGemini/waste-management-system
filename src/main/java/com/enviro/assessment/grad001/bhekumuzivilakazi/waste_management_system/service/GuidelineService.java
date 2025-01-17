@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exception.NotFoundException;
-import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model.Guideline;
-import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model.GuidelineDTO;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.NotFoundException;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.Guideline;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.GuidelineDTO;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.repository.GuidelineRepository;
 
 import jakarta.persistence.EntityManager;
@@ -36,7 +36,7 @@ public class GuidelineService {
         
         // If the savedGuideline is null, throw an exception
         if (savedGuideline == null) {
-            throw new NotFoundException("Guideline could not be saved", null);
+            throw new NotFoundException("Guideline could not be saved");
         }
     
         return savedGuideline;  // Return the saved Guideline object
