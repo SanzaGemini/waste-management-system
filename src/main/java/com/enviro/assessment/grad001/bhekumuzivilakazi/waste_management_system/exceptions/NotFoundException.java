@@ -1,21 +1,28 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions;
 
-import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.response.ResponseClass;
+public class NotFoundException extends RuntimeException {
 
-public final class NotFoundException extends RuntimeException{
-    
-    public  NotFoundException(String type,Long id){
-        super(type +" with Id "+id+" not found.");
+    /**
+     * Constructor to create an exception with a specific message when an entity is not found by ID.
+     *
+     * @param type The type of entity (e.g., Category, Tip) that was not found.
+     * @param id The ID of the entity that could not be found.
+     */
+    public NotFoundException(String type, Long id) {
+        super(String.format("%s with Id %d not found.", type, id));
     }
 
-    public static <T> ResponseClass<T> failedById(String type,Long id){
-            String errorMessage = new NotFoundException(type,id).getMessage();
-        return new ResponseClass<>("failed",null,errorMessage);
+    /**
+     * Constructor to create a generic exception with a custom message.
+     *
+     * @param message The custom message describing the exception.
+     */
+    public NotFoundException(String message) {
+        super(message);
     }
 
-    public static <T> ResponseClass<T> failedByMessage(String message){
-       
-    return new ResponseClass<>("failed",null,message);
-}
-
+    // Optionally, you could add a constructor to handle scenarios where ID might be null.
+    public NotFoundException(String type, String message) {
+        super(String.format("%s not found: %s", type, message));
+    }
 }
