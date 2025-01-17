@@ -57,7 +57,7 @@ public class CategoryService {
         Optional<Category> category = categoryRepository.findById(id);
         
         // If the category is not found, throw a NotFoundException
-        if (!category.isPresent()) {
+        if (category.get()==null) {
             throw new NotFoundException("Category could not be found");
         }
         
