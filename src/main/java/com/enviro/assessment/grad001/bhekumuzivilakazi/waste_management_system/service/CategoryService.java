@@ -5,22 +5,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.NotFoundException;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.Category;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.CategoryDTO;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.repository.CategoryRepository;
 
-import jakarta.persistence.EntityManager;
-
 @Service
 public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;  // Repository for interacting with the database for Category entities
-    
-    @Autowired
-    private EntityManager eManager;  // EntityManager for managing transactions and entity operations
 
     /**
      * Saves a new category to the database.
@@ -29,6 +25,7 @@ public class CategoryService {
      * @return The saved Category entity.
      * @throws NotFoundException if the category could not be saved.
      */
+    @Transactional
     public Category saveCategory(CategoryDTO categoryDTO) {
         // Convert CategoryDTO to Category entity
         Category category = new Category(categoryDTO);
@@ -40,7 +37,7 @@ public class CategoryService {
         if (savedCategory == null) {
             throw new NotFoundException("Category could not be saved");
         }
-    
+
         // Return the saved Category object
         return savedCategory;
     }
@@ -52,15 +49,16 @@ public class CategoryService {
      * @return An Optional containing the found Category, or an empty Optional if not found.
      * @throws NotFoundException if the category with the specified ID could not be found.
      */
+    @Transactional(readOnly = true)
     public Optional<Category> getCategoryById(Long id) {
         // Fetch the category from the repository
         Optional<Category> category = categoryRepository.findById(id);
-        
+
         // If the category is not found, throw a NotFoundException
-        if (category.get()==null) {
+        if (!category.isPresent()) {
             throw new NotFoundException("Category could not be found");
         }
-        
+
         // Return the found category
         return category;
     }
@@ -70,6 +68,7 @@ public class CategoryService {
      * 
      * @return A list of all categories.
      */
+    @Transactional(readOnly = true)
     public List<Category> getCategories() {
         // Return all categories from the repository
         return categoryRepository.findAll();
@@ -83,27 +82,17 @@ public class CategoryService {
      * @return The updated Category entity.
      * @throws NotFoundException if the category with the specified ID could not be found.
      */
+    @Transactional
     public Category updateCategory(Long id, CategoryDTO categoryDTO) {
-        // Begin transaction to update the category
-        eManager.getTransaction().begin();
-
         // Find the existing category by ID
-        Category category = eManager.find(Category.class, id);
-
-        // If category does not exist, throw a NotFoundException
-        if (category == null) {
-            throw new NotFoundException("Category not found for update");
-        }
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found for update"));
 
         // Update the category entity with the new data
         category.updateCategory(categoryDTO);
 
-        // Merge the updated entity into the persistence context and commit the transaction
-        eManager.merge(category);
-        eManager.getTransaction().commit();
-
-        // Return the updated category
-        return getCategoryById(id).get();
+        // Save and return the updated category
+        return categoryRepository.save(category);
     }
 
     /**
@@ -113,23 +102,16 @@ public class CategoryService {
      * @return A list of all remaining categories after the deletion.
      * @throws NotFoundException if the category with the specified ID could not be found for deletion.
      */
+    @Transactional
     public List<Category> deleteCategory(Long id) {
-        // Begin transaction to delete the category
-        eManager.getTransaction().begin();
-
         // Find the category to delete
-        Category category = eManager.find(Category.class, id);
-
-        // If category does not exist, throw a NotFoundException
-        if (category == null) {
-            throw new NotFoundException("Category not found for deletion");
-        }
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found for deletion"));
 
         // Remove the category from the database
-        eManager.remove(category);
-        eManager.getTransaction().commit();
+        categoryRepository.delete(category);
 
         // Return the list of remaining categories after deletion
-        return getCategories();
+        return categoryRepository.findAll();
     }
 }

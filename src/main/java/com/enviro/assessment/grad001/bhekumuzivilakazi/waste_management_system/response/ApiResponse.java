@@ -1,9 +1,6 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.response;
 
-import java.util.List;
 import java.util.Map;
-
-import org.springframework.validation.ObjectError;
 
 /**
  * A generic API response class to standardize the structure of API responses.
@@ -21,7 +18,7 @@ public class ApiResponse<T> {
     public ApiResponse() {}
 
     // Constructor for error responses with error messages
-    public ApiResponse(String status, List<ObjectError> errorMessages) {
+    public ApiResponse(String status, Map<String,String> errorMessages) {
         this.status = status;              // e.g., "error"
         this.message = "There was an error processing the request";  // or a more specific message
         this.data = (T) errorMessages;         // Assign the errorMessages directly without casting
@@ -67,7 +64,7 @@ public class ApiResponse<T> {
 
 
     // Static method for an error response with a map of error messages
-    public static ApiResponse<Object> error(List<ObjectError> errorMessages) {
+    public static ApiResponse<Object> error(Map<String,String> errorMessages) {
         return new ApiResponse<>("error", errorMessages);
     }
 

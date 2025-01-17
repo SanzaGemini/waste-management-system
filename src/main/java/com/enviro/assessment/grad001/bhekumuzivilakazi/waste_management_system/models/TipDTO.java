@@ -1,5 +1,6 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -10,10 +11,12 @@ import jakarta.validation.constraints.Size;
 public class TipDTO {
     
     @NotNull(groups = CreateGroup.class, message = "Title cannot be null during Adding")
+    @NotBlank(groups = CreateGroup.class, message =  "Title cannot be blank during Adding")
     @Size(min = 2, groups = CreateGroup.class, message = "Title must have at least 2 characters")
     private String title;  // The title of the tip
 
     @NotNull(groups = CreateGroup.class, message = "Description cannot be null during Adding")
+    @NotBlank(groups = CreateGroup.class, message =  "Description cannot be blank during Adding")
     @Size(min = 2, groups = CreateGroup.class, message = "Description must have at least 2 characters")
     private String information;  // The description or information about the tip
 

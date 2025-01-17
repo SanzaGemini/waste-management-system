@@ -7,13 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.BindExceptionHandler;
@@ -23,6 +26,8 @@ import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.m
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.CreateGroup;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.response.ApiResponse;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.service.CategoryService;
+
+import jakarta.validation.Valid;
 
 /**
  * This controller provides RESTful endpoints for managing Category resources in the waste management system.
@@ -43,11 +48,8 @@ public class CategoryController {
      */
     @Validated(CreateGroup.class)
     @PostMapping
-    public ResponseEntity<ApiResponse<Object>> addCategory(@RequestBody CategoryDTO categoryDTO, BindingResult bindingResult){
+    public ResponseEntity<ApiResponse<Object>> addCategory(@RequestBody @Valid CategoryDTO categoryDTO, BindingResult bindingResult){
         // Call service to save the category and return the response with success status
-        if(bindingResult.hasErrors()){
-            return BindExceptionHandler.handleBindException(bindingResult.getAllErrors());
-        }
         Category savedCategory = categoryService.saveCategory(categoryDTO); 
         return new ResponseEntity<>(ApiResponse.success(savedCategory), HttpStatus.CREATED); // Return 201 Created
     }
@@ -104,5 +106,11 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<Object>> deleteCategory(@PathVariable Long id){
         categoryService.deleteCategory(id);  // Delete the category using the service
         return new ResponseEntity<>(ApiResponse.success("Category deleted successfully"), HttpStatus.NO_CONTENT);  // Return 204 No Content
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Object>>handleValidationException(MethodArgumentNotValidException ex){
+        return BindExceptionHandler.handleBindException(ex);
     }
 }

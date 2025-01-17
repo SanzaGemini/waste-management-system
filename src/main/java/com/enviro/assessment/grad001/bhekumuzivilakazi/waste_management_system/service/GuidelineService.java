@@ -5,22 +5,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.NotFoundException;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.Guideline;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.GuidelineDTO;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.repository.GuidelineRepository;
 
-import jakarta.persistence.EntityManager;
-
 @Service
 public class GuidelineService {
 
     @Autowired
     private GuidelineRepository guidelineRepository;  // Repository to interact with the database for Guideline entities
-    
-    @Autowired
-    private EntityManager eManager;  // EntityManager for manual transaction control and interaction with the persistence context
 
     /**
      * Saves a new guideline.
@@ -29,6 +25,7 @@ public class GuidelineService {
      * @return The saved Guideline entity.
      * @throws NotFoundException if the guideline cannot be saved.
      */
+    @Transactional
     public Guideline saveGuideline(GuidelineDTO guidelineDTO) {
         Guideline guideline = new Guideline(guidelineDTO);
         
@@ -48,8 +45,18 @@ public class GuidelineService {
      * @param id The ID of the guideline to retrieve.
      * @return An Optional containing the found Guideline or an empty Optional if not found.
      */
+    @Transactional(readOnly = true)
     public Optional<Guideline> getGuidelineById(Long id) {
-        return guidelineRepository.findById(id);
+        // Fetch the category from the repository
+        Optional<Guideline> guideline = guidelineRepository.findById(id);
+
+        // If the category is not found, throw a NotFoundException
+        if (!guideline.isPresent()) {
+            throw new NotFoundException("Category could not be found");
+        }
+
+        // Return the found category
+        return guideline;
     }
 
     /**
@@ -57,6 +64,7 @@ public class GuidelineService {
      * 
      * @return A list of all guidelines in the system.
      */
+    @Transactional(readOnly = true)
     public List<Guideline> getGuidelines() {
         return guidelineRepository.findAll();
     }
@@ -68,13 +76,13 @@ public class GuidelineService {
      * @param guidelineDTO The new data for the guideline.
      * @return The updated Guideline entity.
      */
+    @Transactional
     public Guideline updateGuideline(Long id, GuidelineDTO guidelineDTO) {
-        eManager.getTransaction().begin();
-        Guideline guideline = eManager.find(Guideline.class, id);
+        Guideline guideline = guidelineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Guideline not found for update"));
+
         guideline.updateGuideline(guidelineDTO);
-        eManager.merge(guideline);
-        eManager.getTransaction().commit();
-        return getGuidelineById(id).get();
+        return guidelineRepository.save(guideline);
     }
 
     /**
@@ -83,10 +91,12 @@ public class GuidelineService {
      * @param id The ID of the guideline to delete.
      * @return A list of all guidelines remaining after the deletion.
      */
+    @Transactional
     public List<Guideline> deleteGuideline(Long id) {
-        eManager.getTransaction().begin();
-        eManager.remove(eManager.find(Guideline.class, id));
-        eManager.getTransaction().commit();
-        return getGuidelines();
+        Guideline guideline = guidelineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Guideline not found for deletion"));
+
+        guidelineRepository.delete(guideline);
+        return guidelineRepository.findAll();
     }
 }

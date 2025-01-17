@@ -5,22 +5,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.exceptions.NotFoundException;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.Tip;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.TipDTO;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.repository.TipRepository;
 
-import jakarta.persistence.EntityManager;
-
 @Service
 public class TipService {
 
     @Autowired
     private TipRepository tipRepository;  // Repository for interacting with the database for Tip entities
-    
-    @Autowired
-    private EntityManager eManager;  // EntityManager for manual transaction control and persistence context management
 
     /**
      * Saves a new tip to the database.
@@ -29,6 +25,7 @@ public class TipService {
      * @return The saved Tip entity.
      * @throws NotFoundException if the tip could not be saved (e.g., if the save operation fails).
      */
+    @Transactional
     public Tip saveTip(TipDTO tipDTO) {
         // Convert TipDTO to Tip entity
         Tip tip = new Tip(tipDTO);
@@ -51,13 +48,14 @@ public class TipService {
      * @return An Optional containing the found Tip, or an empty Optional if not found.
      * @throws NotFoundException if the tip with the specified ID is not found.
      */
+    @Transactional(readOnly = true)
     public Optional<Tip> getTipById(Long id) {
         // Fetch the tip by its ID using the repository
         Optional<Tip> tip = tipRepository.findById(id);
 
         // If the tip is not found, throw a NotFoundException
         if (!tip.isPresent()) {
-            throw new NotFoundException("Tip",id);
+            throw new NotFoundException("Tip not found with ID: " + id);
         }
 
         return tip;  // Return the found tip
@@ -68,6 +66,7 @@ public class TipService {
      * 
      * @return A list of all tips in the system.
      */
+    @Transactional(readOnly = true)
     public List<Tip> getTips() {
         // Return the list of all tips using the repository
         return tipRepository.findAll();
@@ -81,29 +80,17 @@ public class TipService {
      * @return The updated Tip entity.
      * @throws NotFoundException if the tip with the specified ID does not exist.
      */
+    @Transactional
     public Tip updateTip(Long id, TipDTO tipDTO) {
-        // Begin the transaction manually using EntityManager
-        eManager.getTransaction().begin();
-
         // Find the existing tip by ID
-        Tip tip = eManager.find(Tip.class, id);
-
-        // If the tip does not exist, throw a NotFoundException
-        if (tip == null) {
-            throw new NotFoundException("Tip not found for update");
-        }
+        Tip tip = tipRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Tip not found for update"));
 
         // Update the tip with the new data from the DTO
         tip.updateTip(tipDTO);
 
-        // Merge the updated tip entity into the persistence context
-        eManager.merge(tip);
-
-        // Commit the transaction to save the changes
-        eManager.getTransaction().commit();
-
-        // Return the updated tip entity
-        return getTipById(id).get();
+        // Save and return the updated tip
+        return tipRepository.save(tip);
     }
 
     /**
@@ -113,25 +100,16 @@ public class TipService {
      * @return A list of all tips remaining after the deletion.
      * @throws NotFoundException if the tip with the specified ID does not exist.
      */
+    @Transactional
     public List<Tip> deleteTip(Long id) {
-        // Begin the transaction manually using EntityManager
-        eManager.getTransaction().begin();
-
         // Find the tip to delete
-        Tip tip = eManager.find(Tip.class, id);
-
-        // If the tip does not exist, throw a NotFoundException
-        if (tip == null) {
-            throw new NotFoundException("Tip not found for deletion");
-        }
+        Tip tip = tipRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Tip not found for deletion"));
 
         // Remove the tip from the database
-        eManager.remove(tip);
-
-        // Commit the transaction to finalize the deletion
-        eManager.getTransaction().commit();
+        tipRepository.delete(tip);
 
         // Return the updated list of tips after deletion
-        return getTips();
+        return tipRepository.findAll();
     }
 }
