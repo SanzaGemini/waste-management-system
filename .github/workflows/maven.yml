@@ -48,4 +48,21 @@ jobs:
     - name: Build with Maven and run unit tests from specific directory
       run: mvn test -Dtest="com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.Unit.*Tests"
 
+  integration-test:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+  
+    - name: Build with Maven and run unit tests from specific directory
+      run: mvn test -Dtest="com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.Integration.*Tests"
+
+
 
