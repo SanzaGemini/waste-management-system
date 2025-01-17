@@ -1,12 +1,12 @@
 package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model.Guideline;
-import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model.GuidelineDTO;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.CreateGroup;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.Guideline;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models.GuidelineDTO;
+import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.response.ApiResponse;
 import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.service.GuidelineService;
 
 /**
@@ -29,18 +31,18 @@ import com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.s
 public class GuidelineController {
 
     @Autowired
-    private GuidelineService guidelineService;  // Service class for handling business logic related to Guideline
-    private List<Guideline> guidelineList = new ArrayList<>();  // Temporary list to store guidelines for random selection
+    private GuidelineService guidelineService;
 
     /**
      * Endpoint to add a new guideline.
      * @param guidelineDTO The guideline data transfer object containing information about the guideline.
      * @return A ResponseEntity containing the saved Guideline object.
      */
+    @Validated(CreateGroup.class)
     @PostMapping
-    public ResponseEntity<Guideline> addGuideline(@RequestBody GuidelineDTO guidelineDTO){
+    public ResponseEntity<ApiResponse<Object>> addGuideline(@RequestBody GuidelineDTO guidelineDTO, BindingResult bindingResult) {
         Guideline savedGuideline = guidelineService.saveGuideline(guidelineDTO);  // Save the guideline using the service
-        return ResponseEntity.ok(savedGuideline);  // Return the saved guideline in the response with HTTP status 200 OK
+        return new ResponseEntity<>(ApiResponse.success(savedGuideline), HttpStatus.CREATED);  // Return 201 Created
     }
 
     /**
@@ -49,9 +51,9 @@ public class GuidelineController {
      * @return A ResponseEntity containing the Guideline if found, or 404 if not found.
      */
     @GetMapping("{id}")
-    public ResponseEntity<Guideline> getGuidelineById(@PathVariable Long id){
-        Optional<Guideline> guideline = guidelineService.getGuidelineById(id);  // Fetch the guideline by ID from the service
-        return ResponseEntity.ok(guideline.get());  // Return the guideline in the response with HTTP status 200 OK
+    public ResponseEntity<ApiResponse<Object>> getGuidelineById(@PathVariable Long id) {
+        Guideline guideline = guidelineService.getGuidelineById(id).get();
+        return new ResponseEntity<>(ApiResponse.success(guideline), HttpStatus.OK);
     }
 
     /**
@@ -59,29 +61,9 @@ public class GuidelineController {
      * @return A ResponseEntity containing a list of all guidelines.
      */
     @GetMapping
-    public ResponseEntity<List<Guideline>> getAllGuidelines(){
-        return ResponseEntity.ok(guidelineService.getGuidelines());  // Return a list of all guidelines from the service
-    }
-
-    /**
-     * Endpoint to get a random guideline.
-     * @return A ResponseEntity containing a random guideline, or a 404 if no guidelines are found.
-     */
-    @GetMapping("rand")
-    public ResponseEntity<Guideline> getRandomGuideline() {
-        // If the list of guidelines is empty, load all guidelines from the service
-        if (guidelineList.isEmpty()) {
-            guidelineList = guidelineService.getGuidelines(); 
-        }
-
-        // Generate a random index to pick a random guideline from the list
-        Long id = guidelineList.get(new Random().nextInt(guidelineList.size())).getId();
-
-        // Retrieve the randomly selected guideline by ID
-        Optional<Guideline> guideline = guidelineService.getGuidelineById(id); 
-        // Return the guideline if found, otherwise return a 404 Not Found response
-        return guideline.map(ResponseEntity::ok)
-                       .orElseGet(() -> ResponseEntity.notFound().build()); 
+    public ResponseEntity<ApiResponse<Object>> getAllGuidelines() {
+        List<Guideline> guidelines = guidelineService.getGuidelines();  // Fetch all guidelines from the service
+        return new ResponseEntity<>(ApiResponse.success(guidelines), HttpStatus.OK);
     }
 
     /**
@@ -91,17 +73,19 @@ public class GuidelineController {
      * @return A ResponseEntity containing the updated Guideline object.
      */
     @PutMapping("{id}")
-    public ResponseEntity<Guideline> updateGuideline(@PathVariable Long id, @RequestBody GuidelineDTO guidelineDTO){
-        return ResponseEntity.ok(guidelineService.updateGuideline(id, guidelineDTO));  // Call the service to update the guideline
+    public ResponseEntity<ApiResponse<Object>> updateGuideline(@PathVariable Long id, @RequestBody GuidelineDTO guidelineDTO) {
+        Guideline updatedGuideline = guidelineService.updateGuideline(id, guidelineDTO);  // Update the guideline using the service
+        return new ResponseEntity<>(ApiResponse.success(updatedGuideline), HttpStatus.OK);
     }
 
     /**
      * Endpoint to delete a guideline by its ID.
      * @param id The ID of the guideline to be deleted.
-     * @return A ResponseEntity containing the updated list of guidelines after deletion.
+     * @return A ResponseEntity indicating successful deletion.
      */
     @DeleteMapping("{id}")
-    public ResponseEntity<List<Guideline>> deleteGuideline(@PathVariable Long id){
-        return ResponseEntity.ok(guidelineService.deleteGuideline(id));  // Call the service to delete the guideline
+    public ResponseEntity<ApiResponse<Object>> deleteGuideline(@PathVariable Long id) {
+        guidelineService.deleteGuideline(id);  // Delete the guideline using the service
+        return new ResponseEntity<>(ApiResponse.success("Guideline deleted successfully"), HttpStatus.NO_CONTENT);  // Return 204 No Content
     }
 }
