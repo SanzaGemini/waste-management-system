@@ -1,4 +1,4 @@
-package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.model;
+package com.enviro.assessment.grad001.bhekumuzivilakazi.waste_management_system.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,7 +56,6 @@ public class Category {
         this.title = title;
     }
 
-
     /**
      * Updates the Category entity using data from a CategoryDTO object.
      * This method only updates the fields if the new values differ from the current values.
@@ -64,10 +63,9 @@ public class Category {
      * @param categoryDTO The CategoryDTO object containing the updated data.
      */
     public void updateCategory(CategoryDTO categoryDTO) {
-        // Update title if the new value is different from the current one
-        if (this.title != categoryDTO.getTitle()) {
+        // Update title if the new value is different from the current one and not null
+        if (categoryDTO.getTitle() != null && !categoryDTO.getTitle().equals(this.title)) {
             this.title = categoryDTO.getTitle();
         }
-        
     }
 }
